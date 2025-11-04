@@ -211,59 +211,10 @@ if __name__ == "__main__":
     fs.writeFileSync(scriptPath, botScript);
 
     // Start bot process
-    const pythonProcess = spawn('python3', [scriptPath], {
+    const pythonProcess = spawn('python', [scriptPath], {
         cwd: botDir,
-        stdio: ['pipe', 'pipe', 'pipe']
-    });
-
-    // Fallback to python if python3 fails
-    pythonProcess.on('error', (error) => {
-        if (error.code === 'ENOENT') {
-            console.log('python3 not found, trying python...');
-            const fallbackProcess = spawn('python', [scriptPath], {
-                cwd: botDir,
-                stdio: ['pipe', 'pipe', 'pipe']
-            });
-            botProcesses.set(bot.id, fallbackProcess);
-
-            // Handle fallback process output
-            let logs = bot.logs || '';
-            const timestamp = new Date().toLocaleString();
-
-            fallbackProcess.stdout.on('data', (data) => {
-                const output = data.toString();
-                logs += `[${timestamp}] ${output}`;
-                bot.logs = logs;
-                console.log(`Bot ${bot.id} stdout:`, output);
-            });
-
-            fallbackProcess.stderr.on('data', (data) => {
-                const output = data.toString();
-                logs += `[${timestamp}] ERROR: ${output}`;
-                bot.logs = logs;
-                console.error(`Bot ${bot.id} stderr:`, output);
-            });
-
-            fallbackProcess.on('close', (code) => {
-                bot.status = 'stopped';
-                bot.uptime_seconds = 0;
-                logs += `[${new Date().toLocaleString()}] 🔴 Bot parado (código: ${code})\n`;
-                bot.logs = logs;
-                botProcesses.delete(bot.id);
-                console.log(`Bot ${bot.id} stopped with code ${code}`);
-            });
-
-            // Update status after a short delay for fallback
-            setTimeout(() => {
-                if (bot.status === 'starting') {
-                    bot.status = 'running';
-                    bot.uptime_seconds = 0;
-                    logs += `[${new Date().toLocaleString()}] ✅ Bot iniciado com sucesso!\n`;
-                    bot.logs = logs;
-                    console.log(`Bot ${bot.name} started successfully`);
-                }
-            }, 3000);
-        }
+        stdio: ['pipe', 'pipe', 'pipe'],
+        env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
     });
 
     botProcesses.set(bot.id, pythonProcess);
@@ -278,6 +229,15 @@ if __name__ == "__main__":
             logs += `[${timestamp}] ${output}\n`;
             bot.logs = logs;
             console.log(`Bot ${bot.id} stdout:`, output);
+
+            // Check if bot is ready
+            if (output.includes('esta online!') && bot.status === 'starting') {
+                bot.status = 'running';
+                bot.uptime_seconds = 0;
+                logs += `[${new Date().toLocaleString()}] Bot iniciado com sucesso!\n`;
+                bot.logs = logs;
+                console.log(`Bot ${bot.name} started successfully`);
+            }
         }
     });
 
@@ -288,29 +248,37 @@ if __name__ == "__main__":
             logs += `[${timestamp}] ERROR: ${output}\n`;
             bot.logs = logs;
             console.error(`Bot ${bot.id} stderr:`, output);
+
+            // If there's an error, stop the bot
+            if (bot.status === 'starting') {
+                bot.status = 'stopped';
+                bot.uptime_seconds = 0;
+                logs += `[${new Date().toLocaleString()}] Bot parado devido a erro\n`;
+                bot.logs = logs;
+            }
         }
     });
 
     pythonProcess.on('close', (code) => {
         bot.status = 'stopped';
         bot.uptime_seconds = 0;
-        const exitReason = code === 0 ? 'normalmente' : `com erro (código: ${code})`;
-        logs += `[${new Date().toLocaleString()}] 🔴 Bot parado ${exitReason}\n`;
+        const exitReason = code === 0 ? 'normalmente' : `com erro (codigo: ${code})`;
+        logs += `[${new Date().toLocaleString()}] Bot parado ${exitReason}\n`;
         bot.logs = logs;
         botProcesses.delete(bot.id);
         console.log(`Bot ${bot.id} stopped with code ${code}`);
     });
 
-    // Update status after a short delay
+    // Timeout for bot startup
     setTimeout(() => {
         if (bot.status === 'starting') {
-            bot.status = 'running';
+            bot.status = 'stopped';
             bot.uptime_seconds = 0;
-            logs += `[${new Date().toLocaleString()}] ✅ Bot iniciado com sucesso!\n`;
+            logs += `[${new Date().toLocaleString()}] Timeout: Bot nao iniciou\n`;
             bot.logs = logs;
-            console.log(`Bot ${bot.name} started successfully`);
+            console.log(`Bot ${bot.name} startup timeout`);
         }
-    }, 5000); // Increased delay for better error detection
+    }, 10000); // 10 second timeout
 
     res.json({ success: true, message: 'Bot está iniciando...' });
 });
