@@ -13,17 +13,8 @@ app.use(express.json());
 app.use(express.static('.'));
 
 // In-memory storage for bots
-let bots = [{
-    id: 1,
-    name: 'Bot 1',
-    token: 'YOUR_BOT_TOKEN_HERE',
-    status: 'stopped',
-    logs: '',
-    created_date: new Date().toISOString(),
-    uptime_seconds: 0,
-    presence: { status: 'online', activities: [{ type: 3, name: 'Magnata Host – Em construção...' }] }
-}];
-let nextId = 2;
+let bots = [];
+let nextId = 1;
 
 // Bot processes
 const botProcesses = new Map();
@@ -44,6 +35,16 @@ app.get('/api/bots/:id', (req, res) => {
 app.post('/api/bots', (req, res) => {
     const { name, token, zip_file_url, presence, logs } = req.body;
 
+    // Validate required fields
+    if (!name || !token) {
+        return res.status(400).json({ error: 'Nome e token são obrigatórios' });
+    }
+
+    // Check if bot name already exists
+    if (bots.some(b => b.name.toLowerCase() === name.toLowerCase())) {
+        return res.status(400).json({ error: 'Já existe um bot com este nome' });
+    }
+
     const bot = {
         id: nextId++,
         name,
@@ -53,10 +54,11 @@ app.post('/api/bots', (req, res) => {
         logs: logs || '',
         created_date: new Date().toISOString(),
         uptime_seconds: 0,
-        presence: presence || { status: 'online', activities: [] }
+        presence: presence || { status: 'online', activities: [{ type: 3, name: 'Magnata Host 🌟' }] }
     };
 
     bots.push(bot);
+    console.log(`Bot criado: ${bot.name} (ID: ${bot.id})`);
     res.json(bot);
 });
 
@@ -73,7 +75,7 @@ app.put('/api/bots/:id', (req, res) => {
 app.delete('/api/bots/:id', (req, res) => {
     const index = bots.findIndex(b => b.id == req.params.id);
     if (index === -1) {
-        return res.status(404).json({ error: 'Bot not found' });
+        return res.status(404).json({ error: 'Bot não encontrado' });
     }
 
     const bot = bots[index];
@@ -84,21 +86,32 @@ app.delete('/api/bots/:id', (req, res) => {
         botProcesses.delete(bot.id);
     }
 
+    // Remove bot directory
+    const botDir = path.join(__dirname, 'bots', `bot_${bot.id}`);
+    if (fs.existsSync(botDir)) {
+        fs.rmSync(botDir, { recursive: true, force: true });
+    }
+
     bots.splice(index, 1);
-    res.json({ success: true });
+    console.log(`Bot ${bot.name} deleted`);
+    res.json({ success: true, message: 'Bot excluído com sucesso' });
 });
 
 app.post('/api/bots/:id/start', (req, res) => {
     const bot = bots.find(b => b.id == req.params.id);
     if (!bot) {
-        return res.status(404).json({ error: 'Bot not found' });
+        return res.status(404).json({ error: 'Bot não encontrado' });
     }
 
     if (bot.status === 'running') {
-        return res.json({ success: true });
+        return res.json({ success: true, message: 'Bot já está rodando' });
     }
 
-    // Simulate starting bot
+    if (bot.status === 'starting') {
+        return res.json({ success: true, message: 'Bot já está iniciando' });
+    }
+
+    // Change status to starting
     bot.status = 'starting';
     bot.last_started = new Date().toISOString();
 
@@ -108,6 +121,8 @@ import discord
 from discord.ext import commands
 import asyncio
 import time
+import sys
+import traceback
 
 TOKEN = "${bot.token}"
 
@@ -116,29 +131,71 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Bot {bot.user} está online!')
+    print(f'✅ Bot {bot.user} está online!')
+    print(f'📊 Servidores: {len(bot.guilds)}')
+    print(f'👥 Usuários: {len(bot.users)}')
+
     # Set presence
-    ${bot.presence ? `
-    await bot.change_presence(
-        status=discord.Status.${bot.presence.status || 'online'},
-        activity=discord.Activity(
-            type=discord.ActivityType.${bot.presence.activities && bot.presence.activities[0] ? bot.presence.activities[0].type === 3 ? 'watching' : 'playing' : 'playing'},
-            name="${bot.presence.activities && bot.presence.activities[0] ? bot.presence.activities[0].name : 'Magnata Host 🌟'}"
+    try:
+        await bot.change_presence(
+            status=discord.Status.${bot.presence?.status || 'online'},
+            activity=discord.Activity(
+                type=discord.ActivityType.${bot.presence?.activities?.[0]?.type === 3 ? 'watching' : 'playing'},
+                name="${bot.presence?.activities?.[0]?.name || 'Magnata Host 🌟'}"
+            )
         )
-    )
-    ` : ''}
-    print('Presença configurada!')
+        print('🎭 Presença configurada!')
+    except Exception as e:
+        print(f'⚠️ Erro na presença: {e}')
+        traceback.print_exc()
+
+@bot.event
+async def on_disconnect():
+    print('❌ Bot desconectado!')
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    print(f'❌ Erro no evento {event}:')
+    traceback.print_exc()
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send('Pong! Bot está funcionando!')
+    try:
+        await ctx.send('🏓 Pong! Bot está funcionando!')
+    except Exception as e:
+        print(f'Erro no comando ping: {e}')
+
+@bot.command()
+async def info(ctx):
+    try:
+        embed = discord.Embed(
+            title="🤖 Informações do Bot",
+            description="Bot hospedado no Magnata Host",
+            color=0x7289da
+        )
+        embed.add_field(name="📊 Servidores", value=str(len(bot.guilds)), inline=True)
+        embed.add_field(name="👥 Usuários", value=str(len(bot.users)), inline=True)
+        embed.add_field(name="⏱️ Uptime", value="Calculando...", inline=True)
+        embed.set_footer(text="Magnata Host - Hospedagem profissional")
+        await ctx.send(embed=embed)
+    except Exception as e:
+        print(f'Erro no comando info: {e}')
 
 # Keep bot running
 async def main():
     try:
+        print('🚀 Iniciando bot...')
         await bot.start(TOKEN)
+    except discord.LoginFailure:
+        print('❌ Token inválido!')
+        sys.exit(1)
+    except discord.PrivilegedIntentsRequired:
+        print('❌ Intents privilegiadas necessárias!')
+        sys.exit(1)
     except Exception as e:
-        print(f'Erro ao iniciar bot: {e}')
+        print(f'❌ Erro ao iniciar bot: {e}')
+        traceback.print_exc()
+        sys.exit(1)
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -154,35 +211,91 @@ if __name__ == "__main__":
     fs.writeFileSync(scriptPath, botScript);
 
     // Start bot process
-    const pythonProcess = spawn('python', [scriptPath], {
+    const pythonProcess = spawn('python3', [scriptPath], {
         cwd: botDir,
         stdio: ['pipe', 'pipe', 'pipe']
+    });
+
+    // Fallback to python if python3 fails
+    pythonProcess.on('error', (error) => {
+        if (error.code === 'ENOENT') {
+            console.log('python3 not found, trying python...');
+            const fallbackProcess = spawn('python', [scriptPath], {
+                cwd: botDir,
+                stdio: ['pipe', 'pipe', 'pipe']
+            });
+            botProcesses.set(bot.id, fallbackProcess);
+
+            // Handle fallback process output
+            let logs = bot.logs || '';
+            const timestamp = new Date().toLocaleString();
+
+            fallbackProcess.stdout.on('data', (data) => {
+                const output = data.toString();
+                logs += `[${timestamp}] ${output}`;
+                bot.logs = logs;
+                console.log(`Bot ${bot.id} stdout:`, output);
+            });
+
+            fallbackProcess.stderr.on('data', (data) => {
+                const output = data.toString();
+                logs += `[${timestamp}] ERROR: ${output}`;
+                bot.logs = logs;
+                console.error(`Bot ${bot.id} stderr:`, output);
+            });
+
+            fallbackProcess.on('close', (code) => {
+                bot.status = 'stopped';
+                bot.uptime_seconds = 0;
+                logs += `[${new Date().toLocaleString()}] 🔴 Bot parado (código: ${code})\n`;
+                bot.logs = logs;
+                botProcesses.delete(bot.id);
+                console.log(`Bot ${bot.id} stopped with code ${code}`);
+            });
+
+            // Update status after a short delay for fallback
+            setTimeout(() => {
+                if (bot.status === 'starting') {
+                    bot.status = 'running';
+                    bot.uptime_seconds = 0;
+                    logs += `[${new Date().toLocaleString()}] ✅ Bot iniciado com sucesso!\n`;
+                    bot.logs = logs;
+                    console.log(`Bot ${bot.name} started successfully`);
+                }
+            }, 3000);
+        }
     });
 
     botProcesses.set(bot.id, pythonProcess);
 
     // Handle process output
     let logs = bot.logs || '';
-    const timestamp = new Date().toLocaleString();
 
     pythonProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        logs += `[${timestamp}] ${output}`;
-        bot.logs = logs;
-        console.log(`Bot ${bot.id} stdout:`, output);
+        const output = data.toString().trim();
+        if (output) {
+            const timestamp = new Date().toLocaleString();
+            logs += `[${timestamp}] ${output}\n`;
+            bot.logs = logs;
+            console.log(`Bot ${bot.id} stdout:`, output);
+        }
     });
 
     pythonProcess.stderr.on('data', (data) => {
-        const output = data.toString();
-        logs += `[${timestamp}] ERROR: ${output}`;
-        bot.logs = logs;
-        console.log(`Bot ${bot.id} stderr:`, output);
+        const output = data.toString().trim();
+        if (output) {
+            const timestamp = new Date().toLocaleString();
+            logs += `[${timestamp}] ERROR: ${output}\n`;
+            bot.logs = logs;
+            console.error(`Bot ${bot.id} stderr:`, output);
+        }
     });
 
     pythonProcess.on('close', (code) => {
         bot.status = 'stopped';
         bot.uptime_seconds = 0;
-        logs += `[${new Date().toLocaleString()}] Bot parado (código: ${code})\n`;
+        const exitReason = code === 0 ? 'normalmente' : `com erro (código: ${code})`;
+        logs += `[${new Date().toLocaleString()}] 🔴 Bot parado ${exitReason}\n`;
         bot.logs = logs;
         botProcesses.delete(bot.id);
         console.log(`Bot ${bot.id} stopped with code ${code}`);
@@ -193,18 +306,23 @@ if __name__ == "__main__":
         if (bot.status === 'starting') {
             bot.status = 'running';
             bot.uptime_seconds = 0;
-            logs += `[${new Date().toLocaleString()}] Bot iniciado com sucesso!\n`;
+            logs += `[${new Date().toLocaleString()}] ✅ Bot iniciado com sucesso!\n`;
             bot.logs = logs;
+            console.log(`Bot ${bot.name} started successfully`);
         }
-    }, 2000);
+    }, 5000); // Increased delay for better error detection
 
-    res.json({ success: true });
+    res.json({ success: true, message: 'Bot está iniciando...' });
 });
 
 app.post('/api/bots/:id/stop', (req, res) => {
     const bot = bots.find(b => b.id == req.params.id);
     if (!bot) {
-        return res.status(404).json({ error: 'Bot not found' });
+        return res.status(404).json({ error: 'Bot não encontrado' });
+    }
+
+    if (bot.status === 'stopped') {
+        return res.json({ success: true, message: 'Bot já está parado' });
     }
 
     if (botProcesses.has(bot.id)) {
@@ -214,9 +332,10 @@ app.post('/api/bots/:id/stop', (req, res) => {
 
     bot.status = 'stopped';
     bot.uptime_seconds = 0;
-    bot.logs += `[${new Date().toLocaleString()}] Bot parado manualmente\n`;
+    bot.logs += `[${new Date().toLocaleString()}] 🛑 Bot parado manualmente\n`;
+    console.log(`Bot ${bot.name} stopped manually`);
 
-    res.json({ success: true });
+    res.json({ success: true, message: 'Bot parado com sucesso' });
 });
 
 app.post('/api/upload', (req, res) => {
