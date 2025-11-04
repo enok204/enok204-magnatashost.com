@@ -435,16 +435,34 @@
       document.body.appendChild(modal);
     }
 
-    window.createBot = () => {
+    window.createBot = async () => {
       const name = document.getElementById('bot-name').value.trim();
+      const token = document.getElementById('bot-token').value.trim();
       if (!name) return alert('Nome obrigatório!');
-      const id = Date.now();
-      const bot = { id, name, status: 'stopped', uptime: 0, logs: [], created: new Date().toLocaleString() };
-      bots.push(bot);
-      localStorage.setItem('magnata-bots', JSON.stringify(bots));
-      addLog(`Bot "${name}" criado.`);
-      document.querySelector('.fixed')?.remove();
-      loadBots();
+      if (!token) return alert('Token obrigatório!');
+
+      try {
+        const response = await fetch('/api/bots', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, token })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          alert(result.error || 'Erro ao criar bot');
+          return;
+        }
+
+        bots = await fetch('/api/bots').then(r => r.json());
+        localStorage.setItem('magnata-bots', JSON.stringify(bots));
+        addLog(`Bot "${name}" criado.`);
+        document.querySelector('.fixed')?.remove();
+        loadBots();
+      } catch (error) {
+        alert('Erro ao conectar com o servidor');
+        console.error(error);
+      }
     };
 
     function loadBots() {
@@ -481,30 +499,58 @@
       });
     }
 
-    window.toggleBot = (id) => {
+    window.toggleBot = async (id) => {
       const bot = bots.find(b => b.id === id);
-      bot.status = bot.status === 'running' ? 'stopped' : 'running';
-      addLog(`Bot "${bot.name}" ${bot.status === 'running' ? 'iniciado' : 'parado'}.`);
-      localStorage.setItem('magnata-bots', JSON.stringify(bots));
-      loadBots();
-      updateStats();
+      const action = bot.status === 'running' ? 'stop' : 'start';
+
+      try {
+        const response = await fetch(`/api/bots/${id}/${action}`, { method: 'POST' });
+        const result = await response.json();
+
+        if (!response.ok) {
+          alert(result.error || `Erro ao ${action === 'start' ? 'iniciar' : 'parar'} bot`);
+          return;
+        }
+
+        bots = await fetch('/api/bots').then(r => r.json());
+        localStorage.setItem('magnata-bots', JSON.stringify(bots));
+        addLog(`Bot "${bot.name}" ${action === 'start' ? 'iniciado' : 'parado'}.`);
+        loadBots();
+        updateStats();
+      } catch (error) {
+        alert('Erro ao conectar com o servidor');
+        console.error(error);
+      }
     };
 
-    window.deleteBot = (id) => {
+    window.deleteBot = async (id) => {
       if (!confirm('Excluir bot?')) return;
-      const bot = bots.find(b => b.id === id);
-      bots = bots.filter(b => b.id !== id);
-      addLog(`Bot "${bot.name}" excluído.`);
-      localStorage.setItem('magnata-bots', JSON.stringify(bots));
-      loadBots();
-      updateStats();
+
+      try {
+        const response = await fetch(`/api/bots/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+
+        if (!response.ok) {
+          alert(result.error || 'Erro ao excluir bot');
+          return;
+        }
+
+        bots = await fetch('/api/bots').then(r => r.json());
+        localStorage.setItem('magnata-bots', JSON.stringify(bots));
+        addLog(`Bot "${bots.find(b => b.id === id)?.name || 'Desconhecido'}" excluído.`);
+        loadBots();
+        updateStats();
+      } catch (error) {
+        alert('Erro ao conectar com o servidor');
+        console.error(error);
+      }
     };
 
     window.viewBotLogs = (id) => {
       showTab('logs');
       const bot = bots.find(b => b.id === id);
       const container = document.getElementById('logs-container');
-      container.innerHTML = `<pre class="text-xs">${bot.logs.join('\n') || 'Sem logs.'}</pre>`;
+      container.innerHTML = `<pre class="text-xs">${bot.logs || 'Sem logs.'}</pre>`;
     };
 
     // === LOGS ===
@@ -549,9 +595,21 @@
     document.getElementById('progress-container').onclick = e => { const rect = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration() * ((e.clientX - rect.left) / rect.width)); };
 
     // === INÍCIO ===
+    async function loadBotsFromServer() {
+      try {
+        const response = await fetch('/api/bots');
+        if (response.ok) {
+          bots = await response.json();
+          localStorage.setItem('magnata-bots', JSON.stringify(bots));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar bots do servidor:', error);
+      }
+    }
+
     if (localStorage.getItem('magnata-loggedin') === 'true') {
       currentUser = JSON.parse(localStorage.getItem('magnata-currentuser'));
-      initDashboard();
+      loadBotsFromServer().then(() => initDashboard());
     }
 
     ['click', 'touchstart'].forEach(ev => document.body.addEventListener(ev, () => { userInteracted = true; initAudio(); }, { once: true }));
