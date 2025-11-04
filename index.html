@@ -133,30 +133,34 @@
   <!-- TELA DE AUTENTICAÇÃO -->
   <div id="auth-container" class="min-h-screen flex items-center justify-center p-6">
     <div class="glass p-8 rounded-3xl shadow-2xl max-w-md w-full border border-white/20">
-      <div class="flex mb-8 border-b border-white/10">
-        <button id="tab-login" class="flex-1 py-3 text-center font-bold text-purple-400 border-b-2 border-purple-400">Login</button>
-        <button id="tab-register" class="flex-1 py-3 text-center font-bold text-gray-400">Registro</button>
+      <div class="text-center">
+        <h1 class="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Magnata Host
+        </h1>
+        <div class="bg-yellow-500/20 border border-yellow-500/30 rounded-xl p-4 mb-6">
+          <div class="flex items-center justify-center mb-2">
+            <svg class="w-6 h-6 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            <span class="text-yellow-400 font-semibold">Site em Desenvolvimento</span>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">
+            Estamos trabalhando para trazer a melhor experiência possível. Em breve você poderá gerenciar seus bots Discord aqui!
+          </p>
+          <div class="bg-purple-500/20 border border-purple-500/30 rounded-lg p-3">
+            <p class="text-purple-300 text-sm mb-2">Para mais informações, junte-se ao nosso Discord:</p>
+            <a href="https://discord.gg/K5ZBEcjXrK" target="_blank" class="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 0 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 0 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 1-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+              </svg>
+              Entrar no Discord
+            </a>
+          </div>
+        </div>
+        <p class="text-gray-400 text-sm">
+          Volte em breve para conhecer nossas funcionalidades.
+        </p>
       </div>
-
-      <!-- LOGIN -->
-      <form id="login-form" class="space-y-6">
-        <input type="text" id="login-username" placeholder="Usuário" class="w-full px-4 py-3 glass rounded-xl border border-white/20 focus:border-purple-500 focus:outline-none" required>
-        <input type="password" id="login-password" placeholder="Senha" class="w-full px-4 py-3 glass rounded-xl border border-white/20 focus:border-purple-500 focus:outline-none" required>
-        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:scale-105 transition transform hover-glow">
-          Entrar
-        </button>
-      </form>
-
-      <!-- REGISTRO -->
-      <form id="register-form" class="space-y-6 hidden">
-        <input type="text" id="reg-username" placeholder="Usuário" class="w-full px-4 py-3 glass rounded-xl border border-white/20 focus:border-purple-500 focus:outline-none" required>
-        <input type="email" id="reg-email" placeholder="E-mail" class="w-full px-4 py-3 glass rounded-xl border border-white/20 focus:border-purple-500 focus:outline-none" required>
-        <input type="password" id="reg-password" placeholder="Senha (mín. 6)" class="w-full px-4 py-3 glass rounded-xl border border-white/20 focus:border-purple-500 focus:outline-none" required minlength="6">
-        <input type="password" id="reg-confirm" placeholder="Confirmar senha" class="w-full px-4 py-3 glass rounded-xl border border-white/20 focus:border-purple-500 focus:outline-none" required>
-        <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3 rounded-xl hover:scale-105 transition transform hover-glow">
-          Criar Conta
-        </button>
-      </form>
     </div>
   </div>
 
@@ -324,249 +328,11 @@
     let bots = JSON.parse(localStorage.getItem('magnata-bots') || '[]');
     let logs = JSON.parse(localStorage.getItem('magnata-logs') || '[]');
 
-    // === AUTENTICAÇÃO ===
-    const tabLogin = document.getElementById('tab-login');
-    const tabRegister = document.getElementById('tab-register');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
+    // Sistema removido - site em desenvolvimento
 
-    tabLogin.onclick = () => { tabLogin.classList.replace('text-gray-400', 'text-purple-400'); tabRegister.classList.replace('text-purple-400', 'text-gray-400'); loginForm.classList.remove('hidden'); registerForm.classList.add('hidden'); };
-    tabRegister.onclick = () => { tabRegister.classList.replace('text-gray-400', 'text-purple-400'); tabLogin.classList.replace('text-purple-400', 'text-gray-400'); registerForm.classList.remove('hidden'); loginForm.classList.add('hidden'); };
+    // Sistema removido - site em desenvolvimento
 
-    registerForm.onsubmit = (e) => {
-      e.preventDefault();
-      const username = document.getElementById('reg-username').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const password = document.getElementById('reg-password').value;
-      const confirm = document.getElementById('reg-confirm').value;
-
-      if (password !== confirm) return alert('Senhas não coincidem!');
-      if (password.length < 6) return alert('Senha muito curta!');
-
-      const users = JSON.parse(localStorage.getItem('magnata-users') || '[]');
-      if (users.some(u => u.username === username)) return alert('Usuário já existe!');
-
-      users.push({ username, email, password });
-      localStorage.setItem('magnata-users', JSON.stringify(users));
-      alert('Cadastro realizado!');
-      tabLogin.click();
-    };
-
-    loginForm.onsubmit = (e) => {
-      e.preventDefault();
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-password').value;
-
-      const users = JSON.parse(localStorage.getItem('magnata-users') || '[]');
-      const user = users.find(u => u.username === username && u.password === password);
-
-      if (user) {
-        currentUser = user;
-        localStorage.setItem('magnata-loggedin', 'true');
-        localStorage.setItem('magnata-currentuser', JSON.stringify(user));
-        initDashboard();
-      } else {
-        alert('Usuário ou senha incorretos!');
-      }
-    };
-
-    function logout() {
-      localStorage.removeItem('magnata-loggedin');
-      localStorage.removeItem('magnata-currentuser');
-      document.getElementById('dashboard').classList.add('hidden');
-      document.getElementById('auth-container').classList.remove('hidden');
-      if (player) player.pauseVideo();
-    }
-
-    // === DASHBOARD ===
-    function initDashboard() {
-      document.getElementById('auth-container').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-
-      const user = JSON.parse(localStorage.getItem('magnata-currentuser'));
-      document.getElementById('welcome-message').innerHTML = `Bem-vindo, <span class="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">${user.username}</span>!`;
-      document.getElementById('user-email').textContent = user.email;
-      document.getElementById('user-avatar').innerHTML = `<div class="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 rounded-full animate-pulse-glow"></div>`;
-      document.getElementById('user-info').innerHTML = `
-        <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-xl">
-          <div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full"></div>
-          <span class="font-medium">${user.username}</span>
-          <button onclick="logout()" class="text-red-400 hover:text-red-300 text-sm">Sair</button>
-        </div>
-      `;
-
-      updateStats();
-      showTab('overview');
-      initAudio();
-    }
-
-    function updateStats() {
-      const running = bots.filter(b => b.status === 'running').length;
-      document.getElementById('bots-count').textContent = running;
-    }
-
-    // === ABAS ===
-    function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-lg'));
-      document.getElementById(tab + '-tab').classList.remove('hidden');
-      const btn = document.querySelector(`[data-tab="${tab}"]`);
-      btn.classList.add('active', 'bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-lg');
-
-      if (tab === 'bots') loadBots();
-      if (tab === 'logs') loadLogs();
-    }
-
-    // === BOTS ===
-    function showCreateBotModal() {
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
-      modal.innerHTML = `
-        <div class="glass p-6 rounded-2xl w-full max-w-md mx-4">
-          <h3 class="text-xl font-bold mb-4">Criar Bot</h3>
-          <input type="text" id="bot-name" placeholder="Nome do Bot" class="w-full px-4 py-3 glass rounded-xl mb-3">
-          <input type="text" id="bot-token" placeholder="Token (opcional)" class="w-full px-4 py-3 glass rounded-xl mb-4">
-          <div class="flex gap-3">
-            <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg">Cancelar</button>
-            <button onclick="createBot()" class="flex-1 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg">Criar</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    window.createBot = async () => {
-      const name = document.getElementById('bot-name').value.trim();
-      const token = document.getElementById('bot-token').value.trim();
-      if (!name) return alert('Nome obrigatório!');
-      if (!token) return alert('Token obrigatório!');
-
-      try {
-        const response = await fetch('http://localhost:3001/api/bots', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, token })
-        });
-
-        const result = await response.json();
-        if (!response.ok) {
-          alert(result.error || 'Erro ao criar bot');
-          return;
-        }
-
-        bots = await fetch('http://localhost:3001/api/bots').then(r => r.json());
-        localStorage.setItem('magnata-bots', JSON.stringify(bots));
-        addLog(`Bot "${name}" criado.`);
-        document.querySelector('.fixed')?.remove();
-        loadBots();
-      } catch (error) {
-        alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
-        console.error(error);
-      }
-    };
-
-    function loadBots() {
-      const list = document.getElementById('bots-list');
-      list.innerHTML = '';
-      if (bots.length === 0) {
-        list.innerHTML = `<p class="text-center text-gray-400 py-8">Nenhum bot. Crie o primeiro!</p>`;
-        return;
-      }
-      bots.forEach(bot => {
-        const card = document.createElement('div');
-        card.className = 'glass-card p-6 rounded-xl';
-        const status = bot.status === 'running' ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400';
-        card.innerHTML = `
-          <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-xl font-bold">${bot.name[0]}</div>
-              <div>
-                <h3 class="font-bold">${bot.name}</h3>
-                <p class="text-xs text-gray-400">ID: ${bot.id}</p>
-              </div>
-            </div>
-            <span class="px-3 py-1 rounded-full text-xs ${status}">${bot.status === 'running' ? 'Online' : 'Parado'}</span>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="toggleBot(${bot.id})" class="flex-1 ${bot.status === 'running' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} px-4 py-2 rounded-lg text-sm font-medium">
-              ${bot.status === 'running' ? 'Parar' : 'Iniciar'}
-            </button>
-            <button onclick="viewBotLogs(${bot.id})" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium">Logs</button>
-            <button onclick="deleteBot(${bot.id})" class="bg-red-800 hover:bg-red-900 px-4 py-2 rounded-lg text-sm font-medium">Excluir</button>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-    }
-
-    window.toggleBot = async (id) => {
-      const bot = bots.find(b => b.id === id);
-      const action = bot.status === 'running' ? 'stop' : 'start';
-
-      try {
-        const response = await fetch(`http://localhost:3001/api/bots/${id}/${action}`, { method: 'POST' });
-        const result = await response.json();
-
-        if (!response.ok) {
-          alert(result.error || `Erro ao ${action === 'start' ? 'iniciar' : 'parar'} bot`);
-          return;
-        }
-
-        bots = await fetch('http://localhost:3001/api/bots').then(r => r.json());
-        localStorage.setItem('magnata-bots', JSON.stringify(bots));
-        addLog(`Bot "${bot.name}" ${action === 'start' ? 'iniciado' : 'parado'}.`);
-        loadBots();
-        updateStats();
-      } catch (error) {
-        alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
-        console.error(error);
-      }
-    };
-
-    window.deleteBot = async (id) => {
-      if (!confirm('Excluir bot?')) return;
-
-      try {
-        const response = await fetch(`http://localhost:3001/api/bots/${id}`, { method: 'DELETE' });
-        const result = await response.json();
-
-        if (!response.ok) {
-          alert(result.error || 'Erro ao excluir bot');
-          return;
-        }
-
-        bots = await fetch('http://localhost:3001/api/bots').then(r => r.json());
-        localStorage.setItem('magnata-bots', JSON.stringify(bots));
-        addLog(`Bot "${bots.find(b => b.id === id)?.name || 'Desconhecido'}" excluído.`);
-        loadBots();
-        updateStats();
-      } catch (error) {
-        alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
-        console.error(error);
-      }
-    };
-
-    window.viewBotLogs = (id) => {
-      showTab('logs');
-      const bot = bots.find(b => b.id === id);
-      const container = document.getElementById('logs-container');
-      container.innerHTML = `<pre class="text-xs">${bot.logs || 'Sem logs.'}</pre>`;
-    };
-
-    // === LOGS ===
-    function addLog(message) {
-      const log = `[${new Date().toLocaleTimeString()}] ${message}`;
-      logs.unshift(log);
-      if (logs.length > 100) logs.pop();
-      localStorage.setItem('magnata-logs', JSON.stringify(logs));
-      if (document.getElementById('logs-tab').classList.contains('hidden') === false) loadLogs();
-    }
-
-    function loadLogs() {
-      const container = document.getElementById('logs-container');
-      container.innerHTML = logs.length ? logs.map(l => `<div class="log-entry text-green-400">${l}</div>`).join('') : '<p class="text-gray-400">Sem logs.</p>';
-      container.scrollTop = 0;
-    }
+    // Sistema removido - site em desenvolvimento
 
     // === PARTÍCULAS, PLAYER, ETC ===
     const canvas = document.getElementById('particles');
@@ -594,25 +360,7 @@
     document.getElementById('play-pause-btn').onclick = () => player && (isPlaying ? player.pauseVideo() : player.playVideo());
     document.getElementById('progress-container').onclick = e => { const rect = e.currentTarget.getBoundingClientRect(); player.seekTo(player.getDuration() * ((e.clientX - rect.left) / rect.width)); };
 
-    // === INÍCIO ===
-    async function loadBotsFromServer() {
-      try {
-        const response = await fetch('http://localhost:3001/api/bots');
-        if (response.ok) {
-          bots = await response.json();
-          localStorage.setItem('magnata-bots', JSON.stringify(bots));
-        }
-      } catch (error) {
-        console.error('Erro ao carregar bots do servidor:', error);
-      }
-    }
-
-    if (localStorage.getItem('magnata-loggedin') === 'true') {
-      currentUser = JSON.parse(localStorage.getItem('magnata-currentuser'));
-      loadBotsFromServer().then(() => initDashboard());
-    }
-
-    ['click', 'touchstart'].forEach(ev => document.body.addEventListener(ev, () => { userInteracted = true; initAudio(); }, { once: true }));
+    // Sistema removido - site em desenvolvimento
   </script>
 </body>
 </html>
