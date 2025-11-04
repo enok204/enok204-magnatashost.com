@@ -442,7 +442,7 @@
       if (!token) return alert('Token obrigatório!');
 
       try {
-        const response = await fetch('/api/bots', {
+        const response = await fetch('http://localhost:3001/api/bots', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, token })
@@ -454,13 +454,13 @@
           return;
         }
 
-        bots = await fetch('/api/bots').then(r => r.json());
+        bots = await fetch('http://localhost:3001/api/bots').then(r => r.json());
         localStorage.setItem('magnata-bots', JSON.stringify(bots));
         addLog(`Bot "${name}" criado.`);
         document.querySelector('.fixed')?.remove();
         loadBots();
       } catch (error) {
-        alert('Erro ao conectar com o servidor');
+        alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
         console.error(error);
       }
     };
@@ -504,7 +504,7 @@
       const action = bot.status === 'running' ? 'stop' : 'start';
 
       try {
-        const response = await fetch(`/api/bots/${id}/${action}`, { method: 'POST' });
+        const response = await fetch(`http://localhost:3001/api/bots/${id}/${action}`, { method: 'POST' });
         const result = await response.json();
 
         if (!response.ok) {
@@ -512,13 +512,13 @@
           return;
         }
 
-        bots = await fetch('/api/bots').then(r => r.json());
+        bots = await fetch('http://localhost:3001/api/bots').then(r => r.json());
         localStorage.setItem('magnata-bots', JSON.stringify(bots));
         addLog(`Bot "${bot.name}" ${action === 'start' ? 'iniciado' : 'parado'}.`);
         loadBots();
         updateStats();
       } catch (error) {
-        alert('Erro ao conectar com o servidor');
+        alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
         console.error(error);
       }
     };
@@ -527,7 +527,7 @@
       if (!confirm('Excluir bot?')) return;
 
       try {
-        const response = await fetch(`/api/bots/${id}`, { method: 'DELETE' });
+        const response = await fetch(`http://localhost:3001/api/bots/${id}`, { method: 'DELETE' });
         const result = await response.json();
 
         if (!response.ok) {
@@ -535,13 +535,13 @@
           return;
         }
 
-        bots = await fetch('/api/bots').then(r => r.json());
+        bots = await fetch('http://localhost:3001/api/bots').then(r => r.json());
         localStorage.setItem('magnata-bots', JSON.stringify(bots));
         addLog(`Bot "${bots.find(b => b.id === id)?.name || 'Desconhecido'}" excluído.`);
         loadBots();
         updateStats();
       } catch (error) {
-        alert('Erro ao conectar com o servidor');
+        alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando.');
         console.error(error);
       }
     };
@@ -597,7 +597,7 @@
     // === INÍCIO ===
     async function loadBotsFromServer() {
       try {
-        const response = await fetch('/api/bots');
+        const response = await fetch('http://localhost:3001/api/bots');
         if (response.ok) {
           bots = await response.json();
           localStorage.setItem('magnata-bots', JSON.stringify(bots));
