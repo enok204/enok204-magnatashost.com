@@ -117,12 +117,11 @@ app.post('/api/bots/:id/start', (req, res) => {
 
     // Create a simple Python bot script
     const botScript = `
+# -*- coding: utf-8 -*-
 import discord
 from discord.ext import commands
 import asyncio
-import time
 import sys
-import traceback
 
 TOKEN = "${bot.token}"
 
@@ -131,57 +130,14 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Bot {bot.user} esta online!')
-    print(f'Servidores: {len(bot.guilds)}')
-    print(f'Usuarios: {len(bot.users)}')
-
-    # Set presence
-    try:
-        await bot.change_presence(
-            status=discord.Status.${bot.presence?.status || 'online'},
-            activity=discord.Activity(
-                type=discord.ActivityType.${bot.presence?.activities?.[0]?.type === 3 ? 'watching' : 'playing'},
-                name="${bot.presence?.activities?.[0]?.name || 'Magnata Host'}"
-            )
-        )
-        print('Presenca configurada!')
-    except Exception as e:
-        print(f'Erro na presenca: {e}')
-        traceback.print_exc()
-
-@bot.event
-async def on_disconnect():
-    print('Bot desconectado!')
-
-@bot.event
-async def on_error(event, *args, **kwargs):
-    print(f'Erro no evento {event}:')
-    traceback.print_exc()
+    print('Bot esta online!')
+    print('Servidores:', len(bot.guilds))
+    print('Usuarios:', len(bot.users))
 
 @bot.command()
 async def ping(ctx):
-    try:
-        await ctx.send('Pong! Bot esta funcionando!')
-    except Exception as e:
-        print(f'Erro no comando ping: {e}')
+    await ctx.send('Pong! Bot esta funcionando!')
 
-@bot.command()
-async def info(ctx):
-    try:
-        embed = discord.Embed(
-            title="Informacoes do Bot",
-            description="Bot hospedado no Magnata Host",
-            color=0x7289da
-        )
-        embed.add_field(name="Servidores", value=str(len(bot.guilds)), inline=True)
-        embed.add_field(name="Usuarios", value=str(len(bot.users)), inline=True)
-        embed.add_field(name="Uptime", value="Calculando...", inline=True)
-        embed.set_footer(text="Magnata Host - Hospedagem profissional")
-        await ctx.send(embed=embed)
-    except Exception as e:
-        print(f'Erro no comando info: {e}')
-
-# Keep bot running
 async def main():
     try:
         print('Iniciando bot...')
@@ -189,12 +145,8 @@ async def main():
     except discord.LoginFailure:
         print('Token invalido!')
         sys.exit(1)
-    except discord.PrivilegedIntentsRequired:
-        print('Intents privilegiadas necessarias!')
-        sys.exit(1)
     except Exception as e:
-        print(f'Erro ao iniciar bot: {e}')
-        traceback.print_exc()
+        print('Erro ao iniciar bot:', str(e))
         sys.exit(1)
 
 if __name__ == "__main__":
